@@ -7,13 +7,13 @@
  * and has to be installed before compiling.
  *
  * Usage: Usage: IBM_ponder_2024-03_2 [-v] [-m memSize] n
- *  Options:
- *   -v
+ *	Options:
+ *	 -v
  *		verbose mode. Print information during the search.
  *
- *   -m memSize
+ *	 -m memSize
  *		The size of the allocated array to rule out integers will be
- *      memSize bytes. Default is ten millions.
+ *		memSize bytes. Default is ten millions.
  *
  ********************************************************************/
  
@@ -105,48 +105,47 @@ int main(int argc, char **argv) {
 			case 'v':
 				verbose = 1;
 				break;
-      		case 'm':
-        		memSize = strtoll(optarg, NULL, 10);
-        		break;
+			case 'm':
+				memSize = strtoll(optarg, NULL, 10);
+				break;
 			case '?':
-        		if (optopt == 'm')
-		        	fprintf (stderr, "Option -m requires an argument.\n");
+				if (optopt == 'm')
+					fprintf (stderr, "Option -m requires an argument.\n");
 				else if (isprint (optopt))
 					fprintf (stderr, "Unknown option `-%c'.\n", optopt);
 				else
 					fprintf (stderr, "Unknown option character `\\x%x'.\n", optopt);
 				fprintf (stderr, "Usage: greedy [-v] [-m memsize] n\n");
-
-        		return 1;
+				return 1;
 			default:
 				abort();
 		}
 	}
-    if (optind+1 != argc) {
+	if (optind+1 != argc) {
 		fprintf (stderr, "Usage: greedy [-v] [-m memsize] n\n");
 		return 1;
 	}
 
-    n = strtoll(argv[optind], NULL, 10);
+	n = strtoll(argv[optind], NULL, 10);
 
 	upperBoundDiff = n*(n+1)/2;
 	primesieve_init(&it);	
-		
-	/* Initialize prime array */
-    fillArrayOfPrimes(0, memSize);
-    while (1) {
-    	/* Have we ruled out all array? If so, proceed with the next integers block */
-    	if (startValue-offset >= memSize)
-		    fillArrayOfPrimes(offset = startValue, memSize);
-    	res = isCorrectValue(offset, startValue, n);
-    	if (res)
-    		break;
-    	startValue++;
-    }
 
-    if (res)
+	/* Initialize prime array */
+	fillArrayOfPrimes(0, memSize);
+	while (1) {
+		/* Have we ruled out all array? If so, proceed with the next integers block */
+		if (startValue-offset >= memSize)
+			fillArrayOfPrimes(offset = startValue, memSize);
+		res = isCorrectValue(offset, startValue, n);
+		if (res)
+			break;
+		startValue++;
+	}
+
+	if (res)
 		printf("For n=%" PRIdFAST64 ", a start value of %" PRIdFAST64 " has been found\n", n, startValue);
-		
+
 	printf("Verifying...\n");
 
 	int iter;
@@ -154,9 +153,9 @@ int main(int argc, char **argv) {
 		printf("ERROR: %" PRIdFAST64 " is prime (%" PRIdFAST64 ") at iteration %d\n", startValue, res, iter);
 	else
 		printf("SUCCESS! %" PRIdFAST64 " is the correct answer.\n", startValue);
-	
-  	primesieve_free_iterator(&it);
-  	free(primeArray);
+
+	primesieve_free_iterator(&it);
+	free(primeArray);
 }
 
 
@@ -165,13 +164,13 @@ int main(int argc, char **argv) {
 /* This function is used for verification purpose. Given an initial value A, it will
  *  check that no member of the sequence A, A+1, A+1+2,... of length n is a prime.
  * It returns 0 if the sequence is correct and the 'incorrect' prime otherwise.
- *  'iter' is used to keep track of the iteration number (so the calling code knows
- *  which An is prime).
+ *  'iterationNbr' is used to keep track of the iteration number
+ *  (so the calling code knows which An is prime).
  */
 int_fast64_t CheckSequence(int_fast64_t initialValue, int_fast64_t n, int *iterationNbr) {
 	int_fast64_t nextPrime;
 	*iterationNbr = 1;
-	
+
 	primesieve_jump_to(&it, initialValue, initialValue + n*(n-1));
 	do {
 		while ((nextPrime = primesieve_next_prime(&it)) < initialValue)
@@ -179,7 +178,6 @@ int_fast64_t CheckSequence(int_fast64_t initialValue, int_fast64_t n, int *itera
 		if (nextPrime == initialValue)
 			return initialValue;
 		while ((initialValue += (*iterationNbr)++) < nextPrime) {
-//			printf("%d : %" PRIdFAST64 "\n", *iter, initialValue);
 			if (*iterationNbr >= n)
 				break; // get next prime
 		}

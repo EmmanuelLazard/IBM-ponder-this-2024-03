@@ -13,12 +13,12 @@
  *
  *   -m memSize
  *		The size of the allocated array to rule out integers will be
- *      memSize bytes. Default is ten millions.
+ *		memSize bytes. Default is ten millions.
  *
  *   -s startValue
  *		The search will start at the given startValue. Useful if a
- *      lower bound for the true correct value is known as it will
- *      save search time.
+ *		lower bound for the true correct value is known as it will
+ *		save search time.
  *
  ********************************************************************/
 
@@ -35,7 +35,7 @@
 // Function prototypes
 void initArray(int_fast64_t size);
 int_fast64_t processArray(int_fast64_t offset, int_fast64_t startValueIndex,
-							int_fast64_t n, int_fast64_t size);
+                          int_fast64_t n, int_fast64_t size);
 int_fast64_t look4StartValue(int_fast64_t startValue, int_fast64_t n, int_fast64_t size);
 int_fast64_t CheckSequence(int_fast64_t initialValue, int_fast64_t n, int *iter);
 
@@ -90,7 +90,7 @@ void initArray(int_fast64_t size) {
  * If all integers have been ruled out, the function returns -1.
  */
  int_fast64_t processArray(int_fast64_t offset, int_fast64_t startValueIndex,
- 							int_fast64_t n, int_fast64_t size) {
+                           int_fast64_t n, int_fast64_t size) {
 
 	int_fast64_t possibleStartIndex = startValueIndex;
 	int_fast64_t primeCounter = 0;
@@ -165,34 +165,34 @@ int main(int argc, char **argv) {
 			case 'v':
 				verbose = 1;
 				break;
-      		case 'm':
-        		memSize = strtoll(optarg, NULL, 10);
-        		break;
-      		case 's':
-        		startValue = strtoll(optarg, NULL, 10);
-        		break;
+			case 'm':
+				memSize = strtoll(optarg, NULL, 10);
+				break;
+			case 's':
+				startValue = strtoll(optarg, NULL, 10);
+				break;
 			case '?':
-        		if (optopt == 'm' || optopt == 's')
-		        	fprintf (stderr, "Option -%c requires an argument.\n", optopt);
+				if (optopt == 'm' || optopt == 's')
+					fprintf (stderr, "Option -%c requires an argument.\n", optopt);
 				else if (isprint (optopt))
 					fprintf (stderr, "Unknown option `-%c'.\n", optopt);
 				else
 					fprintf (stderr, "Unknown option character `\\x%x'.\n", optopt);
 				fprintf (stderr, "Usage: IBM_ponder_2024_03 [-v] [-m memSize] [-s startValue] n\n");
-
-        		return 1;
+				return 1;
 			default:
 				abort();
 		}
 	}
-    if (optind+1 != argc) {
+	if (optind+1 != argc) {
 		fprintf (stderr, "Usage: IBM_ponder_2024_03 [-v] [-m memSize] [-s startValue] n\n");
 		return 1;
 	}
-    n = strtoll(argv[optind], NULL, 10);
 
-	primesieve_init(&it);	
-		
+	n = strtoll(argv[optind], NULL, 10);
+
+	primesieve_init(&it);
+
 	if (verbose)
 		printf("Looking for correct start value for n=%" PRIdFAST64 "\n", n);
 	startValue = look4StartValue(startValue, n, memSize);
@@ -209,8 +209,8 @@ int main(int argc, char **argv) {
 	else
 		printf("SUCCESS! %" PRIdFAST64 " is the correct answer.\n", startValue);
 
-  	primesieve_free_iterator(&it);
-  	free(numberArray);
+	primesieve_free_iterator(&it);
+	free(numberArray);
 }
 
 
@@ -219,27 +219,27 @@ int main(int argc, char **argv) {
 /* This function is used for verification purpose. Given an initial value A, it will
  *  check that no member of the sequence A, A+1, A+1+2,... of length n is a prime.
  * It returns 0 if the sequence is correct and the 'incorrect' prime otherwise.
- *  'iter' is used to keep track of the iteration number (so the calling code knows
- *  which An is prime if the sequence is incorrect).
+ *  'iterationNbr' is used to keep track of the iteration number
+ *  (so the calling code knows which An is prime).
  */
-int_fast64_t CheckSequence(int_fast64_t initialValue, int_fast64_t n, int *iter) {
+int_fast64_t CheckSequence(int_fast64_t initialValue, int_fast64_t n, int *iterationNbr) {
 	int_fast64_t nextPrime;
-	*iter = 1;
-	
+	*iterationNbr = 1;
+
 	primesieve_jump_to(&it, initialValue, initialValue + n*(n-1));
 	do {
 		while ((nextPrime = primesieve_next_prime(&it)) < initialValue)
 			; // Get the first prime to check
 		if (nextPrime == initialValue)
 			return initialValue;
-		while ((initialValue += (*iter)++) < nextPrime) {
-			if (*iter >= n)
+		while ((initialValue += (*iterationNbr)++) < nextPrime) {
+			if (*iterationNbr >= n)
 				break; // get next prime
 		}
 		if (nextPrime == initialValue)
 			return initialValue;
-	} while (*iter < n);
+	} while (*iterationNbr < n);
 	if (verbose)
-		printf("Last check was for iteration %d, with value (%" PRIdFAST64 ")\n", *iter, initialValue);
+		printf("Last check was for iteration %d, with value (%" PRIdFAST64 ")\n", *iterationNbr, initialValue);
 	return 0;
 }

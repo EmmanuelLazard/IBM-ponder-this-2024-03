@@ -7,16 +7,16 @@
  * and has to be installed before compiling.
  *
  * Usage: Usage: IBM_ponder_2024-03_2_MT [-v] [-t numThreads] [-m memSize] n
- *  Options:
- *   -v
+ *	Options:
+ *	 -v
  *		verbose mode. Print information during the search.
  *
- *   -t numThreads
- *      Uses numThreads threads to compute the results (default is 1)
+ *	 -t numThreads
+ *		Uses numThreads threads to compute the results (default is 1)
  *
- *   -m memSize
+ *	 -m memSize
  *		The size of the allocated array to rule out integers will be
- *      memSize bytes. Default is ten millions.
+ *		memSize bytes. Default is ten millions.
  *
  ********************************************************************/
  
@@ -34,7 +34,7 @@
 
 /* A bunch of global variables accessible by all threads on a read-only basis */
 int verbose = 0;
-char *primeArray = NULL;         /* Array of primes */
+char *primeArray = NULL;     /* Array of primes */
 int_fast64_t n ;             /* Which X_n do we want? */
 int_fast64_t memSize;        /* Size of the integers window */
 int_fast64_t upperBoundDiff; /* Difference between a_0 and a_n, ie: n(n-1)/2 */
@@ -132,36 +132,36 @@ int isCorrectValue(int_fast64_t value) {
 void *mainLoop(void *ptr) {
 	int_fast64_t initialOffset = *(int_fast64_t *) ptr;
 	int_fast64_t threadID = initialOffset - globalOffset;
-    int_fast64_t *startValue = malloc(sizeof(int_fast64_t));
-    int res = 0;
+	int_fast64_t *startValue = malloc(sizeof(int_fast64_t));
+	int res = 0;
 
 	*startValue = initialOffset;
-    while (*startValue < memSize + globalOffset) {
-    	res = isCorrectValue(*startValue);
-    	if (verbose && !(*startValue & 0x7FFFFFF))
-    		// print tested value once in a while
-    		printf("Testing %" PRIdFAST64 "\n", *startValue);
-    	if (res || (bestValue && bestValue < *startValue))
-    		break;
-    	*startValue += numThreads;
-    }
-    if (*startValue >= memSize + globalOffset) {
-    	if (verbose)
-	    	printf("Thread %" PRIdFAST64 " out of memory.\n", threadID);
-    	*startValue = -1;
-    	pthread_exit(startValue);
-    }
-    pthread_mutex_lock(&mutex);
-    if (!bestValue || *startValue < bestValue) {
-    	if (verbose)
-	       	printf("Thread %" PRIdFAST64 " updates best value.\n", threadID);
-	    bestValue = *startValue;
+	while (*startValue < memSize + globalOffset) {
+		res = isCorrectValue(*startValue);
+		if (verbose && !(*startValue & 0x7FFFFFF))
+			// print tested value once in a while
+			printf("Testing %" PRIdFAST64 "\n", *startValue);
+		if (res || (bestValue && bestValue < *startValue))
+			break;
+		*startValue += numThreads;
+	}
+	if (*startValue >= memSize + globalOffset) {
+		if (verbose)
+			printf("Thread %" PRIdFAST64 " out of memory.\n", threadID);
+		*startValue = -1;
+		pthread_exit(startValue);
+	}
+	pthread_mutex_lock(&mutex);
+	if (!bestValue || *startValue < bestValue) {
+		if (verbose)
+			printf("Thread %" PRIdFAST64 " updates best value.\n", threadID);
+		bestValue = *startValue;
 	} else {
 		if (verbose)
-		   	printf("Thread %" PRIdFAST64 " stops.\n", threadID);
+			printf("Thread %" PRIdFAST64 " stops.\n", threadID);
 	}
-    pthread_mutex_unlock(&mutex);
-    return startValue;
+	pthread_mutex_unlock(&mutex);
+	return startValue;
 }
 
 /* The main function will set up an integer range and launch several threads
@@ -169,10 +169,10 @@ void *mainLoop(void *ptr) {
  *  next integer range (increasing globalOffset by memSize).
  */
 int main(int argc, char **argv) {
-    pthread_t ID[MAX_THREADS];
-    int_fast64_t tab[MAX_THREADS];
-    void *exitPtr[MAX_THREADS];
- 	int i;
+	pthread_t ID[MAX_THREADS];
+	int_fast64_t tab[MAX_THREADS];
+	void *exitPtr[MAX_THREADS];
+	int i;
 
 	memSize = 100000000L; // default memory size of 100 millions
 	int c;
@@ -182,55 +182,54 @@ int main(int argc, char **argv) {
 			case 'v':
 				verbose = 1;
 				break;
-      		case 'm':
-        		memSize = strtoll(optarg, NULL, 10);
-        		break;
-      		case 't':
-        		numThreads = strtoll(optarg, NULL, 10);
-       		    if ((numThreads <= 0) || (numThreads > MAX_THREADS)) {
-			        printf("Number of threads has to be between 1 and %d.\n", MAX_THREADS);
-        			exit(1);
-        		}
-	       		break;
+			case 'm':
+				memSize = strtoll(optarg, NULL, 10);
+				break;
+			case 't':
+				numThreads = strtoll(optarg, NULL, 10);
+				if ((numThreads <= 0) || (numThreads > MAX_THREADS)) {
+					printf("Number of threads has to be between 1 and %d.\n", MAX_THREADS);
+					exit(1);
+				}
+				break;
 			case '?':
-        		if (optopt == 'm' || optopt == 't')
-		        	fprintf (stderr, "Option -%c requires an argument.\n", optopt);
+				if (optopt == 'm' || optopt == 't')
+					fprintf (stderr, "Option -%c requires an argument.\n", optopt);
 				else if (isprint (optopt))
 					fprintf (stderr, "Unknown option `-%c'.\n", optopt);
 				else
 					fprintf (stderr, "Unknown option character `\\x%x'.\n", optopt);
 				fprintf (stderr, "Usage: greedy [-v] [-m memsize] [-t #threads] n\n");
-
-        		return 1;
+				return 1;
 			default:
 				abort();
 		}
 	}
-    if (optind+1 != argc) {
+	if (optind+1 != argc) {
 		fprintf (stderr, "Usage: greedy [-v] [-m memsize] n\n");
 		return 1;
 	}
 
-    n = strtoll(argv[optind], NULL, 10);
-    upperBoundDiff = n*(n+1)/2;
-    globalOffset = 0;
+	n = strtoll(argv[optind], NULL, 10);
+	upperBoundDiff = n*(n+1)/2;
+	globalOffset = 0;
 	primesieve_init(&it);	
-    pthread_mutex_init(&mutex, NULL); /* initialize lock */
+	pthread_mutex_init(&mutex, NULL); /* initialize lock */
 
 	while (!bestValue) {
-	    fillArrayOfPrimes(memSize);
-	    for (i = 0; i < numThreads; i++) {
-    	    tab[i] = i+globalOffset;
-        	pthread_create(&ID[i], NULL, mainLoop, &tab[i]);
-    	}
-	    for (i = 0; i < numThreads; i++) {
-        	pthread_join(ID[i], &exitPtr[i]);
+		fillArrayOfPrimes(memSize);
+		for (i = 0; i < numThreads; i++) {
+			tab[i] = i+globalOffset;
+			pthread_create(&ID[i], NULL, mainLoop, &tab[i]);
+		}
+		for (i = 0; i < numThreads; i++) {
+			pthread_join(ID[i], &exitPtr[i]);
 			if (verbose)
-	        	printf("Le thread %d returns %" PRIdFAST64 ".\n", i, *(int_fast64_t *) exitPtr[i]);
-        	free(exitPtr[i]);
-        }
-        globalOffset += memSize;
-    }
+				printf("Le thread %d returns %" PRIdFAST64 ".\n", i, *(int_fast64_t *) exitPtr[i]);
+			free(exitPtr[i]);
+		}
+		globalOffset += memSize;
+	}
 	pthread_mutex_destroy(&mutex); /* destroy lock */
 		
 	printf("For n=%" PRIdFAST64 ", a start value of %" PRIdFAST64 " has been found\n", n, bestValue);
@@ -243,8 +242,8 @@ int main(int argc, char **argv) {
 	else
 		printf("SUCCESS! %" PRIdFAST64 " is the correct answer.\n", bestValue);
 
-  	primesieve_free_iterator(&it);
-  	free(primeArray);
+	primesieve_free_iterator(&it);
+	free(primeArray);
 }
 
 
@@ -253,13 +252,13 @@ int main(int argc, char **argv) {
 /* This function is used for verification purpose. Given an initial value A, it will
  *  check that no member of the sequence A, A+1, A+1+2,... of length n is a prime.
  * It returns 0 if the sequence is correct and the 'incorrect' prime otherwise.
- *  'iter' is used to keep track of the iteration number (so the calling code knows
- *  which An is prime).
+ *  'iterationNbr' is used to keep track of the iteration number
+ *  (so the calling code knows which An is prime).
  */
 int_fast64_t CheckSequence(int_fast64_t initialValue, int_fast64_t n, int *iterationNbr) {
 	int_fast64_t nextPrime;
 	*iterationNbr = 1;
-	
+
 	primesieve_jump_to(&it, initialValue, initialValue + n*(n-1));
 	do {
 		while ((nextPrime = primesieve_next_prime(&it)) < initialValue)
@@ -277,4 +276,3 @@ int_fast64_t CheckSequence(int_fast64_t initialValue, int_fast64_t n, int *itera
 		printf("Last check was for iteration %d, with value (%" PRIdFAST64 ")\n", *iterationNbr, initialValue);
 	return 0;
 }
-
