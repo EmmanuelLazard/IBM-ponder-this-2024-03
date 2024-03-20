@@ -154,8 +154,6 @@ int main(int argc, char **argv) {
 		printf("ERROR: %" PRIdFAST64 " is prime (%" PRIdFAST64 ") at iteration %d\n", startValue, res, iter);
 	else
 		printf("SUCCESS! %" PRIdFAST64 " is the correct answer.\n", startValue);
-	exit(0);
-
 	
   	primesieve_free_iterator(&it);
   	free(primeArray);

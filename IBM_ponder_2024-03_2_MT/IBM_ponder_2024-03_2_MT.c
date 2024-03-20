@@ -230,7 +230,6 @@ int main(int argc, char **argv) {
         	free(exitPtr[i]);
         }
         globalOffset += memSize;
-//        free(primes);
     }
 	pthread_mutex_destroy(&mutex); /* destroy lock */
 		
@@ -243,7 +242,6 @@ int main(int argc, char **argv) {
 		printf("ERROR: %" PRIdFAST64 " is prime (%" PRIdFAST64 ") at iteration %d\n", bestValue, res, iter);
 	else
 		printf("SUCCESS! %" PRIdFAST64 " is the correct answer.\n", bestValue);
-	exit(0);
 
   	primesieve_free_iterator(&it);
   	free(primeArray);
@@ -269,7 +267,6 @@ int_fast64_t CheckSequence(int_fast64_t initialValue, int_fast64_t n, int *itera
 		if (nextPrime == initialValue)
 			return initialValue;
 		while ((initialValue += (*iterationNbr)++) < nextPrime) {
-//			printf("%d : %" PRIdFAST64 "\n", *iter, initialValue);
 			if (*iterationNbr >= n)
 				break; // get next prime
 		}

@@ -1,0 +1,8 @@
+.DS_Store
+/OLD*
+/*/bin*
+/primesieve-master*
+*.dSYM
+*.o
+a.out
+core 
